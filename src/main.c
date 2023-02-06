@@ -145,7 +145,7 @@ int	split_map(t_map *map)
 		perror("Error\nCould not split map");
 		return (-1);
 	}
-	free(map->map);
+	//free(map->map);
 	return (0);
 }
 
@@ -193,9 +193,22 @@ int	find_init_pos(t_map *map)
 	return (-1);
 }
 
-int	find_path(t_map *map)
+int	find_path(char **map, int x, int y)
 {
-	find_init_pos(map);
+	if (map[y][x] == '1')
+		return (0);
+	if (map[y][x] == 'E')
+		return (1);
+	map[y][x] = '1';
+	if (find_path(map, y, x + 1) == 1)
+		return (1);
+	if (find_path(map, y, x - 1) == 1)
+		return (1);
+	if (find_path(map, y + 1, x) == 1)
+		return (1);
+	if (find_path(map, y - 1, x) == 1)
+		return (1);
+	return (0);
 }
 
 int	check_bad_ber(char *argv, t_map *map)
@@ -215,7 +228,8 @@ int	check_bad_ber(char *argv, t_map *map)
 	check_map_shape(map);
 	split_map(map);
 	is_closed(map);
-	find_path(map);
+	find_init_pos(map);
+	find_path(map->map_2d, map->init_pos_x, map->init_pos_y);
 	/*while (map->height >= 0)
 	{
 		free(map->map_2d[map->height]);
