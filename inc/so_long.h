@@ -2,6 +2,7 @@
 # define SO_LONG_H
 
 # include <stdio.h>
+# include <stdlib.h>
 # include <fcntl.h>
 # include "../../ft_printf/ft_printf/ft_printf.h"
 # include "../../get_next_line/get_next_line/get_next_line.h"
@@ -15,6 +16,7 @@ typedef struct s_map {
 	int		init_pos_y;
 	char	*map;
 	char	**map_2d;
+	int		collectibles_nbr;
 }	t_map;
 
 #endif
