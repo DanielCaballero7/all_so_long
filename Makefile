@@ -6,11 +6,12 @@ OBJS = ${SRCS:.c=.o}
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g
 RM = rm -f
+MLX_LINUX = -lmlx -L../mlx_linux -lXext -lX11
 
 all: $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT)
-	$(CC) $(CFLAGS) $(SRCS) $(LIBFT) -o $(NAME)
+	$(CC) $(CFLAGS) $(SRCS) $(LIBFT) $(MLX_LINUX) -o $(NAME)
 $(LIBFT):
 	make re -C ../libft/libft/
 %.o: %.c

@@ -234,6 +234,31 @@ int	find_path(char **map, int collectibles, int y, int x)
 	return (0);
 }
 
+void free_map(t_map *map)
+{
+	int i;
+
+	i = 0;
+	while (map->map_2d[i])
+	{
+		free(map->map_2d[i]);
+		i++;
+	}
+	free(map->map_2d);
+}
+
+void printf_map(t_map *map)
+{
+	int i;
+
+	i = 0;
+	while (map->map_2d[i])
+	{
+		printf("%s\n", map->map_2d[i]);
+		i++;
+	}
+}
+
 int	check_bad_ber(char *argv, t_map *map)
 {
 	int		fd;
@@ -257,20 +282,163 @@ int	check_bad_ber(char *argv, t_map *map)
 		perror("Error\nNo path to exit");
 		exit(0);
 	}
-	/*while (map->height >= 0)
+	free_map(map);
+	split_map(map);
+	//free(map);
+	return (0);
+}
+
+int load_imgs(t_imgs **imgs, t_mlx *mlx)
+{
+	int	i;
+
+	i = 0;
+	while (i < 5)
 	{
-		free(map->map_2d[map->height]);
-		map->height--;
+		imgs[i] = malloc(sizeof(t_imgs));
+		if (imgs[i] == NULL)
+		{
+			perror("Error\nCould not make imgs");
+			return (-1);
+		}
+		i++;
 	}
-	free(map->map_2d);
-	free(map);
-	*/
+	imgs[0]->img = mlx_xpm_file_to_image(mlx->mlx, "imgs/wall.xpm",
+			&imgs[0]->width, &imgs[0]->height);
+	imgs[1]->img = mlx_xpm_file_to_image(mlx->mlx, "imgs/path.xpm",
+			&imgs[1]->width, &imgs[1]->height);
+	imgs[2]->img = mlx_xpm_file_to_image(mlx->mlx, "imgs/paulinol1.xpm",
+			&imgs[2]->width, &imgs[2]->height);
+	imgs[3]->img = mlx_xpm_file_to_image(mlx->mlx, "imgs/selene.xpm",
+			&imgs[3]->width, &imgs[3]->height);
+	imgs[4]->img = mlx_xpm_file_to_image(mlx->mlx, "imgs/exit.xpm",
+			&imgs[4]->width, &imgs[4]->height);
+	return (0);
+}
+
+int print_data_img(t_imgs *img, t_mlx *mlx, int y, int x)
+{
+	int i;
+	int j;
+	int size;
+	char *data;
+
+	i = 0;
+	j = 0;
+	size = 0;
+	data = mlx_get_data_addr(img->img, &mlx->bits_per_pixel, &size, &mlx->endian);
+	while (i < 80)
+	{
+		while (j < 80)
+		{
+			mlx->data[(y + i) * mlx->line_length + (x + j) * (mlx->bits_per_pixel / 8)] = data[i * size + j * (mlx->bits_per_pixel / 8)];
+			mlx->data[(y + i) * mlx->line_length + (x + j) * (mlx->bits_per_pixel / 8) + 1] = data[i * size + j * (mlx->bits_per_pixel / 8) + 1];
+			mlx->data[(y + i) * mlx->line_length + (x + j) * (mlx->bits_per_pixel / 8) + 2] = data[i * size + j * (mlx->bits_per_pixel / 8) + 2];
+			j++;
+		}
+		j = 0;
+		i++;
+	}
+	return (0);
+}
+
+int draw_map(t_mlx *mlx, t_map *map, t_imgs **imgs)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	while (i < map->height)
+	{
+		while (j < map->width)
+		{
+			if (map->map_2d[i][j] == '1')
+				print_data_img(imgs[0], mlx, 80 * i, 80 * j);
+			else if (map->map_2d[i][j] == '0')
+				print_data_img(imgs[1], mlx, 80 * i, 80 * j);
+			else if (map->map_2d[i][j] == 'C')
+				print_data_img(imgs[3], mlx, 80 * i, 80 * j);
+			else if (map->map_2d[i][j] == 'E')
+				print_data_img(imgs[4], mlx, 80 * i, 80 * j);
+			else if (map->map_2d[i][j] == 'P')
+				print_data_img(imgs[2], mlx, 80 * i, 80 * j);
+			j++;
+		}
+		j = 0;
+		i++;
+	}
+	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img, 0, 0);
+	return (0);
+}
+
+int	change_map(t_map *map, int y, int x, char a, char b)
+{
+	if (map->exit_deleted == 1)
+	{
+		map->map_2d[map->init_pos_y][map->init_pos_x] = 'E';
+		map->map_2d[map->init_pos_y + y][map->init_pos_x + x] = b;
+		map->exit_deleted = 0;
+	}
+	else
+	{
+		map->map_2d[map->init_pos_y][map->init_pos_x] = a;
+		map->map_2d[map->init_pos_y + y][map->init_pos_x + x] = b;
+	}
+	map->init_pos_y += y;
+	map->init_pos_x += x;
+	return (0);
+}
+
+int move(t_map *map, int y, int x)
+{
+	if (map->map_2d[map->init_pos_y + y][map->init_pos_x + x] == '0')
+		change_map(map, y, x, '0', 'P');
+	else if (map->map_2d[map->init_pos_y + y][map->init_pos_x + x] == 'C')
+	{
+		change_map(map, y, x, '0', 'P');
+		map->collectibles_nbr--;
+	}
+	else if (map->map_2d[map->init_pos_y + y][map->init_pos_x + x] == 'E')
+	{
+		if (map->collectibles_nbr == 0)
+		{
+			printf("You win!\n");
+			exit(0);
+		}
+		else
+			printf("Collect all the collectibles!\n");
+		change_map(map, y, x, '0', 'P');
+		map->exit_deleted = 1;
+	}
+	return (0);
+}
+
+int key_hook(int key, void *params)
+{
+	t_links	*links;
+
+	links = (t_links *)params;
+	if (key == 65307)
+		exit(0);
+	if (key == 119)
+		move(links->map, -1, 0);
+	if (key == 115)
+		move(links->map, 1, 0);
+	if (key == 97)
+		move(links->map, 0, -1);
+	if (key == 100)
+		move(links->map, 0, 1);
+	draw_map(links->mlx, links->map, links->imgs);
 	return (0);
 }
 
 int	main(int argc, char **argv)
 {
 	t_map	*map;
+	t_mlx	*mlx;
+	t_imgs	*imgs[5];
+	t_links	*params;
 
 	map = malloc(sizeof(t_map));
 	if (check_bad_params(argc, argv[1]) == -1
@@ -278,6 +446,43 @@ int	main(int argc, char **argv)
 	{
 		return (-1);
 	}
+	mlx = malloc(sizeof(t_mlx));
+	mlx->mlx = NULL;
+	mlx->mlx = mlx_init();
+	if (mlx->mlx == NULL)
+	{
+		perror("Error\nCould not initialize mlx");
+		return (-1);
+	}
+	mlx->win = mlx_new_window(mlx->mlx, map->width * 80,
+			map->height * 80, "so_long");
+	if (mlx->win == NULL)
+	{
+		perror("Error\nCould not create window");
+		return (-1);
+	}
+	mlx->img = mlx_new_image(mlx->mlx, map->width * 80, map->height * 80);
+	if (mlx->img == NULL)
+	{
+		perror("Error\nCould not create image");
+		return (-1);
+	}
+	mlx->data = mlx_get_data_addr(mlx->img, &mlx->bits_per_pixel,
+			&mlx->line_length, &mlx->endian);
+	if (mlx->data == NULL)
+	{
+		perror("Error\nCould not get data address");
+		return (-1);
+	}
+	load_imgs(imgs, mlx);
+	draw_map(mlx, map, imgs);
+	params = malloc(sizeof(t_links));
+	params->mlx = mlx;
+	params->map = map;
+	params->imgs = imgs;
+	mlx_key_hook(mlx->win, key_hook, (void *)params);
+	mlx_loop(mlx->mlx);
+	//free(mlx->mlx);
 	return (0);
 }
 
