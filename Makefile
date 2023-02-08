@@ -1,5 +1,6 @@
 NAME = so_long
-SRCS = src/main.c ../get_next_line/get_next_line/get_next_line.c \
+SRCS = src/main.c src/check.c src/imgs.c src/utils_map.c src/utils.c \
+		../get_next_line/get_next_line/get_next_line.c \
 		../get_next_line/get_next_line/get_next_line_utils.c
 LIBFT = ../libft/libft/libft.a
 OBJS = ${SRCS:.c=.o}
