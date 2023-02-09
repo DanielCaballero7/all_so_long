@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   check.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcaballe <dcaballe@student.42malaga.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/09 19:49:11 by dcaballe          #+#    #+#             */
+/*   Updated: 2023/02/09 19:49:13 by dcaballe         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../inc/so_long.h"
 
 void	check_bad_chars(t_map *map)
@@ -10,7 +22,8 @@ void	check_bad_chars(t_map *map)
 		if (map->map[i] != 'P' && map->map[i] != 'E' && map->map[i] != 'C'
 			&& map->map[i] != '1' && map->map[i] != '0' && map->map[i] != '\n')
 		{
-			free_t_map(map);
+			free(map->map);
+			free(map);
 			ft_error("Error\nUnknown character in map");
 		}
 		i++;
@@ -40,7 +53,8 @@ void	check_mandatory_chars(t_map *map)
 	if (exit != 1 || map->collectibles_nbr < 1 || init_pos != 1)
 	{
 		i = map->collectibles_nbr;
-		free_t_map(map);
+		free(map->map);
+		free(map);
 		error_mandatory_chars(exit, i, init_pos);
 	}
 }
@@ -57,17 +71,18 @@ void	check_map_shape(t_map *map)
 	while (map->map[i] != '\0')
 	{
 		if (map->map[i] == '\n')
+		{
+			if (columns == 0)
+				columns = i;
 			lines++;
+		}
 		i++;
 	}
-	columns = (i - lines) / lines;
 	if (columns < 3 || lines < 3 || columns == lines)
 	{
-		free_t_map(map);
-		if (columns == lines)
-			ft_error("Error\nMap is not rectangular");
-		else if (columns < 3 || lines < 3)
-			ft_error("Error\nMap too small");
+		free(map->map);
+		free(map);
+		ft_error("Error\nMap is incorrect");
 	}
 }
 

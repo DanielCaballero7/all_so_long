@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcaballe <dcaballe@student.42malaga.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/09 19:48:57 by dcaballe          #+#    #+#             */
+/*   Updated: 2023/02/09 19:49:01 by dcaballe         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../inc/so_long.h"
 
 void	check_bad_params(int argc, char *argv)
@@ -14,13 +26,13 @@ void	error_mandatory_chars(int end, int collectible, int init_pos)
 	if (end > 1)
 		ft_error("Error\nToo many exits");
 	else if (init_pos > 1)
-		perror("Error\nToo many initial positions");
+		ft_error("Error\nToo many initial positions");
 	else if (collectible < 1)
-		perror("Error\nNo collectibles");
+		ft_error("Error\nNo collectibles");
 	else if (end < 1)
-		perror("Error\nNo exit");
+		ft_error("Error\nNo exit");
 	else if (init_pos < 1)
-		perror("Error\nNo initial position");
+		ft_error("Error\nNo initial position");
 }
 
 void	check_bad_ber(char *argv, t_map *map)
@@ -34,9 +46,9 @@ void	check_bad_ber(char *argv, t_map *map)
 		ft_error("Error\nCould not open file");
 	}
 	read_ber(fd, map);
+	check_map_shape(map);
 	check_bad_chars(map);
 	check_mandatory_chars(map);
-	check_map_shape(map);
 	split_map(map);
 	is_closed(map);
 	find_init_pos(map);
@@ -69,6 +81,7 @@ void	ft_mlx_init(t_mlx *mlx, t_map *map)
 	}
 	mlx->data = mlx_get_data_addr(mlx->img, &mlx->bpp,
 			&mlx->size, &mlx->endian);
+	map->moves = 0;
 }
 
 int	main(int argc, char **argv)
@@ -96,6 +109,6 @@ int	main(int argc, char **argv)
 		free_all(mlx, map, imgs, "Error\nCould not initialize mlx");
 	init_params(params, mlx, map, imgs);
 	mlx_key_hook(mlx->win, ft_key_hook, (void *)params);
+	mlx_hook(mlx->win, 17, 0, ft_close, params);
 	mlx_loop(mlx->mlx);
-	return (0);
 }

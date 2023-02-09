@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   imgs.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcaballe <dcaballe@student.42malaga.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/09 19:48:44 by dcaballe          #+#    #+#             */
+/*   Updated: 2023/02/09 19:48:49 by dcaballe         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../inc/so_long.h"
 
 int	load_imgs(t_imgs **imgs, t_mlx *mlx)
@@ -54,3 +66,19 @@ void	print_data_img(t_imgs *img, t_mlx *mlx, int y, int x)
 	}
 }
 
+int	ft_close(t_links *links)
+{
+	free_t_imgs(links->imgs, links->mlx);
+	free_t_mlx(links->mlx);
+	free_t_map(links->map);
+	free(links);
+	exit(0);
+	return (0);
+}
+
+void	free_all_move(t_mlx *mlx, t_map *map, t_imgs **imgs)
+{
+	free_t_imgs(imgs, mlx);
+	free_t_mlx(mlx);
+	free_t_map(map);
+}

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcaballe <dcaballe@student.42malaga.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/09 19:49:25 by dcaballe          #+#    #+#             */
+/*   Updated: 2023/02/09 19:49:27 by dcaballe         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../inc/so_long.h"
 
 void	read_ber(int fd, t_map *map)
@@ -12,12 +24,14 @@ void	read_ber(int fd, t_map *map)
 	}
 	if (map->map == 0)
 	{
-		free_t_map(map);
+		free(map->map);
+		free(map);
 		ft_error("Error\nMalloc failed");
 	}
 	if (*(map->map) == '\0')
 	{
-		free_t_map(map);
+		free(map->map);
+		free(map);
 		ft_error("Error\nEmpty file");
 	}
 	close(fd);
@@ -81,37 +95,20 @@ int	find_path(char **map, int collectibles, int y, int x)
 
 int	ft_key_hook(int key, void *params)
 {
-	t_links	*links;
+	t_links		*links;
 
 	links = (t_links *)params;
-	if (key == 119)
+	if (key == 13)
 		move(links->map, -1, 0);
-	else if (key == 115)
+	else if (key == 1)
 		move(links->map, 1, 0);
-	else if (key == 97)
+	else if (key == 0)
 		move(links->map, 0, -1);
-	else if (key == 100)
+	else if (key == 2)
 		move(links->map, 0, 1);
-	if (key == 65307 || links->map->end == 1)
+	if (key == 53 || links->map->end == 1)
 	{
-		mlx_destroy_window(links->mlx->mlx, links->mlx->win);
-		mlx_destroy_image(links->mlx->mlx, links->imgs[0]->img);
-		mlx_destroy_image(links->mlx->mlx, links->imgs[1]->img);
-		mlx_destroy_image(links->mlx->mlx, links->imgs[2]->img);
-		mlx_destroy_image(links->mlx->mlx, links->imgs[3]->img);
-		mlx_destroy_image(links->mlx->mlx, links->imgs[4]->img);
-		mlx_destroy_image(links->mlx->mlx, links->mlx->img);
-		free(links->imgs[0]);
-		free(links->imgs[1]);
-		free(links->imgs[2]);
-		free(links->imgs[3]);
-		free(links->imgs[4]);
-		mlx_destroy_display(links->mlx->mlx);
-		free(links->mlx->mlx);
-		free(links->mlx);
-		free(links->map->map);
-		ft_free_split(links->map->map_2d);
-		free(links->map);
+		free_all_move(links->mlx, links->map, links->imgs);
 		free(links);
 		exit(0);
 	}

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils_map.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dcaballe <dcaballe@student.42malaga.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/02/09 19:49:58 by dcaballe          #+#    #+#             */
+/*   Updated: 2023/02/09 19:50:04 by dcaballe         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../inc/so_long.h"
 
 void	split_map(t_map *map)
@@ -68,18 +80,18 @@ void	draw_map(t_mlx *mlx, t_map *map, t_imgs **imgs)
 	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img, 0, 0);
 }
 
-void	change_map(t_map *map, int y, int x, char a, char b)
+void	change_map(t_map *map, int y, int x, char a)
 {
 	if (map->exit_deleted == 1)
 	{
 		map->map_2d[map->init_pos_y][map->init_pos_x] = 'E';
-		map->map_2d[map->init_pos_y + y][map->init_pos_x + x] = b;
+		map->map_2d[map->init_pos_y + y][map->init_pos_x + x] = 'P';
 		map->exit_deleted = 0;
 	}
 	else
 	{
 		map->map_2d[map->init_pos_y][map->init_pos_x] = a;
-		map->map_2d[map->init_pos_y + y][map->init_pos_x + x] = b;
+		map->map_2d[map->init_pos_y + y][map->init_pos_x + x] = 'P';
 	}
 	map->init_pos_y += y;
 	map->init_pos_x += x;
@@ -88,24 +100,28 @@ void	change_map(t_map *map, int y, int x, char a, char b)
 int	move(t_map *map, int y, int x)
 {
 	if (map->map_2d[map->init_pos_y + y][map->init_pos_x + x] == '0')
-		change_map(map, y, x, '0', 'P');
+		change_map(map, y, x, '0');
 	else if (map->map_2d[map->init_pos_y + y][map->init_pos_x + x] == 'C')
 	{
-		change_map(map, y, x, '0', 'P');
+		change_map(map, y, x, '0');
 		map->collectibles_nbr--;
 	}
 	else if (map->map_2d[map->init_pos_y + y][map->init_pos_x + x] == 'E')
 	{
 		if (map->collectibles_nbr == 0)
 		{
-			printf("You win!\n");
 			map->end = 1;
 			return (1);
 		}
 		else
 			printf("Collect all the collectibles!\n");
-		change_map(map, y, x, '0', 'P');
+		change_map(map, y, x, '0');
 		map->exit_deleted = 1;
 	}
+	else
+		return (0);
+	map->moves++;
+	ft_putnbr_fd(map->moves, 1);
+	ft_putstr_fd("\n", 1);
 	return (0);
 }
