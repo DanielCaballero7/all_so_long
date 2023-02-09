@@ -12,15 +12,15 @@ void	read_ber(int fd, t_map *map)
 	}
 	if (map->map == 0)
 	{
-		free(map);
+		free_t_map(map);
 		ft_error("Error\nMalloc failed");
 	}
 	if (*(map->map) == '\0')
 	{
-		free(map->map);
-		free(map);
+		free_t_map(map);
 		ft_error("Error\nEmpty file");
 	}
+	close(fd);
 }
 
 int	find_init_pos(t_map *map)

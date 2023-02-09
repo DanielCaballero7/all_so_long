@@ -90,5 +90,14 @@ void	split_map(t_map *map);
 
 void	free_map(t_map *map);
 
+void	free_t_mlx(t_mlx *mlx);
+
+void	free_t_map(t_map *map);
+
+void	free_t_imgs(t_imgs **imgs, t_mlx *mlx);
+
+void	free_all(t_mlx *mlx, t_map *map, t_imgs **imgs, char *str);
+
+void	init_params(t_links *params, t_mlx *mlx, t_map *map, t_imgs **imgs);
 
 #endif

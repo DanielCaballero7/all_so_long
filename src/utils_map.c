@@ -21,8 +21,7 @@ void	split_map(t_map *map)
 	map->map_2d = ft_split(map->map, '\n');
 	if (!map->map_2d)
 	{
-		free(map->map);
-		free(map);
+		free_map(map);
 		ft_error("Error\nCould not split map");
 	}
 }

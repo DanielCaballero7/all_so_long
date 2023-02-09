@@ -10,8 +10,7 @@ void	check_bad_chars(t_map *map)
 		if (map->map[i] != 'P' && map->map[i] != 'E' && map->map[i] != 'C'
 			&& map->map[i] != '1' && map->map[i] != '0' && map->map[i] != '\n')
 		{
-			free(map->map);
-			free(map);
+			free_t_map(map);
 			ft_error("Error\nUnknown character in map");
 		}
 		i++;
@@ -41,8 +40,7 @@ void	check_mandatory_chars(t_map *map)
 	if (exit != 1 || map->collectibles_nbr < 1 || init_pos != 1)
 	{
 		i = map->collectibles_nbr;
-		free(map->map);
-		free(map);
+		free_t_map(map);
 		error_mandatory_chars(exit, i, init_pos);
 	}
 }
@@ -65,8 +63,7 @@ void	check_map_shape(t_map *map)
 	columns = (i - lines) / lines;
 	if (columns < 3 || lines < 3 || columns == lines)
 	{
-		free(map->map);
-		free(map);
+		free_t_map(map);
 		if (columns == lines)
 			ft_error("Error\nMap is not rectangular");
 		else if (columns < 3 || lines < 3)
@@ -86,9 +83,7 @@ void	is_closed(t_map *map)
 			|| (i < map->height && map->map_2d[i][0] != '1')
 			|| (i < map->height && map->map_2d[i][map->width - 1] != '1'))
 		{
-			free(map->map);
-			ft_free_split(map->map_2d);
-			free(map);
+			free_t_map(map);
 			ft_error("Error\nMap is not closed");
 		}
 		i++;

@@ -43,9 +43,7 @@ void	check_bad_ber(char *argv, t_map *map)
 	if (find_path(map->map_2d, map->collectibles_nbr,
 			map->init_pos_y, map->init_pos_x) == 0)
 	{
-		free(map->map);
-		ft_free_split(map->map_2d);
-		free(map);
+		free_t_map(map);
 		ft_error("Error\nNo path to exit");
 	}
 	free_map(map);
@@ -58,34 +56,19 @@ void	ft_mlx_init(t_mlx *mlx, t_map *map)
 			map->height * 80, "so_long");
 	if (mlx->win == NULL)
 	{
-		free (mlx->mlx);
-		free (mlx);
-		free (map->map);
-		ft_free_split(map->map_2d);
-		free (map);
+		free_t_mlx(mlx);
+		free_t_map(map);
 		ft_error("Error\nCould not create window");
 	}
 	mlx->img = mlx_new_image(mlx->mlx, map->width * 80, map->height * 80);
 	if (mlx->img == NULL)
-	{
-		free (mlx->mlx);
-		free (mlx);
-		free (map->map);
-		ft_free_split(map->map_2d);
-		free (map);
+	{	
+		free_t_mlx(mlx);
+		free_t_map(map);
 		ft_error("Error\nCould not create image");
 	}
 	mlx->data = mlx_get_data_addr(mlx->img, &mlx->bpp,
 			&mlx->size, &mlx->endian);
-	if (mlx->data == NULL)
-	{
-		free (mlx->mlx);
-		free (mlx);
-		free (map->map);
-		ft_free_split(map->map_2d);
-		free (map);
-		ft_error("Error\nCould not get data address");
-	}
 }
 
 int	main(int argc, char **argv)
@@ -103,51 +86,16 @@ int	main(int argc, char **argv)
 	mlx = malloc(sizeof(t_mlx));
 	mlx->mlx = mlx_init();
 	if (mlx->mlx == NULL)
-	{
-		free (mlx->mlx);
-		free (mlx);
-		free (map->map);
-		ft_free_split(map->map_2d);
-		free (map);
-		ft_error("Error\nCould not initialize mlx");
-	}
+		free_all(mlx, map, imgs, "Error\nCould not initialize mlx");
 	ft_mlx_init(mlx, map);
 	if (load_imgs(imgs, mlx) == -1)
-	{
-		free (mlx->mlx);
-		free (mlx);
-		free (map->map);
-		ft_free_split(map->map_2d);
-		free (map);
-		ft_error("Error\nCould not load images");
-	}
+		free_all(mlx, map, imgs, "Error\nCould not initialize mlx");
 	draw_map(mlx, map, imgs);
 	params = malloc(sizeof(t_links));
 	if (!params)
-	{
-		free (mlx->mlx);
-		free (mlx);
-		free (map->map);
-		ft_free_split(map->map_2d);
-		free (map);
-		ft_error("Error\nCould not allocate memory");
-	}
-	map->exit_deleted = 0;
-	map->end = 0;
-	params->mlx = mlx;
-	params->map = map;
-	params->imgs = imgs;
+		free_all(mlx, map, imgs, "Error\nCould not initialize mlx");
+	init_params(params, mlx, map, imgs);
 	mlx_key_hook(mlx->win, ft_key_hook, (void *)params);
 	mlx_loop(mlx->mlx);
 	return (0);
 }
-
-/*int	main(int argc, char **argv)
-{
-	t_mlx	mlx;
-
-	check_bad_params(argc, argv[1]);
-	mlx.mlx = mlx_init();
-	mlx_destroy_display(mlx.mlx);
-	free (mlx.mlx);
-}*/
